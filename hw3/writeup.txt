@@ -1,0 +1,67 @@
+Q1 (a) Loops are independent and there is an implicit barrier after the first loop, hence both threads will wait to complete the execution.
+The static directive divides the loop in 2 equal chunks. The first thread finishes first and takes n(n+2)/8 and the second thread will take 3(n-1)n/4. So the other thread
+will wait for 5n^2/8 - n milliseconds before moving on to the next loop.
+(b) If we used schedule(static,1) for both loops, each thread would spend roughly half of the time executing the parallel region. However, the execution time of each thread
+would be slightly longer due to the overhead of scheduling each iteration separately.
+(c) Using schedule(dynamic,1) instead would likely improve performance, as each thread would be assigned a small chunk of iterations to work on at a time. 
+This would reduce the amount of idle time each thread spends waiting for the other to complete its chunk of iterations.
+(d) The nowait clause can be used to eliminate waiting time between threads. If we add the nowait clause to each of the for directives, 
+the threads would each spend roughly half the time executing the parallel region, with no waiting time between them.
+
+
+Q2 Architecture - 4 physical cores and 8 logical cores : Intel(R) Core(TM) i7-1065G7 CPU @ 1.30GHz. 320KB l1_cache(but wsl allots 32KB), 2MB l2_cache, 8MB l3_cache
+sequential-scan = 0.499067s
+parallel-scan   = 0.110769s for 2 threads,  error = 0
+parallel-scan   = 0.103671s for 4 threads,  error = 0
+parallel-scan   = 0.112004s for 8 threads,  error = 0
+parallel-scan   = 0.119862s for 16 threads,  error = 0
+parallel-scan   = 0.119431s for 32 threads,  error = 0
+parallel-scan   = 0.125285s for 64 threads,  error = 0
+parallel-scan   = 0.139544s for 128 threads,  error = 0
+
+Observations - Improvement stops at 4 threads (number of physical cores) and deteriorates for threads more than physical cores, due to memory access.
+The run is for 100 million long vector. The improvement over sequential-scan is almost 4 times, which is in aggreement with number of cores.
+
+Q3 With the same machine as in earlier questions
+-----------Jacobi output------------
+Serial Implementation runtime : 0.036192s, points : 2500, intial error : 50.000000, final error : 0.004999 
+Serial Implementation runtime : 1.317103s, points : 40000, intial error : 200.000000, final error : 48.020353 
+Serial Implementation runtime : 13.482914s, points : 250000, intial error : 500.000000, final error : 341.411692 
+Parallel Implementation runtime : 0.032901s, Threads : 2, points : 2500, intial error : 50.000000, final error : 0.004999 
+Parallel Implementation runtime : 0.048137s, Threads : 4, points : 2500, intial error : 50.000000, final error : 0.004999 
+Parallel Implementation runtime : 1.854091s, Threads : 8, points : 2500, intial error : 50.000000, final error : 0.004999 
+Parallel Implementation runtime : 5.803116s, Threads : 16, points : 2500, intial error : 50.000000, final error : 0.004999 
+Parallel Implementation runtime : 0.630304s, Threads : 2, points : 40000, intial error : 200.000000, final error : 48.020353 
+Parallel Implementation runtime : 0.559562s, Threads : 4, points : 40000, intial error : 200.000000, final error : 48.020353 
+Parallel Implementation runtime : 0.636607s, Threads : 8, points : 40000, intial error : 200.000000, final error : 48.020353 
+Parallel Implementation runtime : 11.674925s, Threads : 16, points : 40000, intial error : 200.000000, final error : 48.020353 
+Parallel Implementation runtime : 7.087697s, Threads : 2, points : 250000, intial error : 500.000000, final error : 341.411692 
+Parallel Implementation runtime : 5.217225s, Threads : 4, points : 250000, intial error : 500.000000, final error : 341.411692 
+Parallel Implementation runtime : 5.170689s, Threads : 8, points : 250000, intial error : 500.000000, final error : 341.411692 
+Parallel Implementation runtime : 15.276375s, Threads : 16, points : 250000, intial error : 500.000000, final error : 341.411692
+
+Observations - Runtime doesn't improve with small number of points as thread management's overhead dominates the timing. But with more points, there is an
+improvement by a factor of 2, with the best being with 4 threads (as expected). For 250000 points performance with 8 and 4 threads is almost equal. One possible reason
+could be the memory bottleneck. The runtimes with 16 threads is significantly deteriorates, due to resource allocation.
+-------------------------------------------------------------------------------------------------------------------------
+
+-----------GS output------------
+Serial Implementation runtime : 0.026253s, points : 2500, intial error : 50.000000, final error : 0.005000 
+Serial Implementation runtime : 1.789736s, points : 40000, intial error : 200.000000, final error : 20.017881 
+Serial Implementation runtime : 14.305015s, points : 250000, intial error : 500.000000, final error : 389.430358 
+Parallel Implementation runtime : 0.029715s, Threads : 2, points : 2500, intial error : 50.000000, final error : 0.005000 
+Parallel Implementation runtime : 0.029829s, Threads : 4, points : 2500, intial error : 50.000000, final error : 0.005000 
+Parallel Implementation runtime : 0.029815s, Threads : 8, points : 2500, intial error : 50.000000, final error : 0.005000 
+Parallel Implementation runtime : 0.027205s, Threads : 16, points : 2500, intial error : 50.000000, final error : 0.005000 
+Parallel Implementation runtime : 1.793012s, Threads : 2, points : 40000, intial error : 200.000000, final error : 20.017881 
+Parallel Implementation runtime : 1.771917s, Threads : 4, points : 40000, intial error : 200.000000, final error : 20.017881 
+Parallel Implementation runtime : 1.752374s, Threads : 8, points : 40000, intial error : 200.000000, final error : 20.017881 
+Parallel Implementation runtime : 1.750070s, Threads : 16, points : 40000, intial error : 200.000000, final error : 20.017881 
+Parallel Implementation runtime : 14.560516s, Threads : 2, points : 250000, intial error : 500.000000, final error : 389.430358 
+Parallel Implementation runtime : 15.010741s, Threads : 4, points : 250000, intial error : 500.000000, final error : 389.430358 
+Parallel Implementation runtime : 15.537633s, Threads : 8, points : 250000, intial error : 500.000000, final error : 389.430358 
+Parallel Implementation runtime : 15.057642s, Threads : 16, points : 250000, intial error : 500.000000, final error : 389.430358
+
+Observations - There is no improvement with parallel execution. Though not clear, but one possible explanation is that memory access is the bottleneck
+due to non-sequential access required for separate black and red updates. I have tried multiple configurations for parallelization and loop orders, but 
+the results are similar for all the cases.
