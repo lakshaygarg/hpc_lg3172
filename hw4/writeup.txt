@@ -1,0 +1,34 @@
+Q1
+pingpong latency: 1.142460e-03 ms
+pingpong bandwidth: 1.220065e+01 GB/s
+Nodes - cs[482-483]
+
+Q2 with N = 100
+Nodes - cs[273-275]
+Total sum for 3 process is 300
+ring latency: 2.065316e-01 ms
+ring bandwidth: 1.936750e-05 GB/s
+
+with N = 1000000
+Nodes - cs[273-275]
+Total sum for 3 process is 3000000
+ring latency: 1.775847e-03 ms
+ring bandwidth: 2.252446e-03 GB/s
+
+with array size 2MB and N = 100
+Nodes - cs[364-366]
+ring latency: 3.570111e-01 ms
+ring bandwidth: 5.602067e+00 GB/s
+
+Q3
+Nodes - cs[010-022,081-092,146-167,171-184,441-472,496-502]
+N = 100000000, Error = 0, Wtime = 2301.870303 ms
+
+Q4
+I am working on FlashAttention algorithm for calculating self attention scores for differetn sparsity patterns. Team memeber Nikola.
+We are implementing the paper called Flash Attention which uses smart tilling for lower number of memory reads. The paper specifies algorithms
+for dense and block-sparse case (forward and backward pass). The idea is to load chunks of mtrices in fast GPU memory, perform operations and 
+write back to slower memory. The problem is not compute intensive , but memory intensive. Along with implementing the algorithm for different sparsity patterns,
+we are extending the idea to circulant matrices. Additionally we are inmplementing the differnet sparsity patterns for different cases, namely naive, single thread cpu,
+parallel cpu (OpenMP) and if time permits GPU. Further we will analyse the wall-time for each case and benchmark against the naive implementation.
+The resulting API will be availabe for wider use on Github.
